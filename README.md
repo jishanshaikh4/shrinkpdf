@@ -1,4 +1,6 @@
 ### Shrinkpdf
+[![CodeFactor](https://www.codefactor.io/repository/github/jishanshaikh4/shrinkpdf/badge)](https://www.codefactor.io/repository/github/jishanshaikh4/shrinkpdf)
+
 Reduce size of PDF (compress) using Ghostscript at terminal.
 
 #### Execution
