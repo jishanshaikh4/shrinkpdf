@@ -43,11 +43,11 @@ shrink ()
 	  -dSubsetFonts=true			\
 	  -dAutoRotatePages=/None		\
 	  -dColorImageDownsampleType=/Bicubic	\
-	  -dColorImageResolution=$3		\
+	  -dColorImageResolution="$3"		\
 	  -dGrayImageDownsampleType=/Bicubic	\
-	  -dGrayImageResolution=$3		\
+	  -dGrayImageResolution="$3"		\
 	  -dMonoImageDownsampleType=/Subsample	\
-	  -dMonoImageResolution=$3		\
+	  -dMonoImageResolution="$3"		\
 	  -sOutputFile="$2"			\
 	  "$1"
 }
@@ -59,8 +59,8 @@ check_smaller ()
 	if [ ! -f "$1" ] || [ ! -f "$2" ]; then
 		return 0;
 	fi
-	ISIZE="$(echo $(wc -c "$1") | cut -f1 -d\ )"
-	OSIZE="$(echo $(wc -c "$2") | cut -f1 -d\ )"
+	ISIZE="$(echo "$(wc -c "$1")" | cut -f1 -d\ )"
+	OSIZE="$(echo "$(wc -c "$2")" | cut -f1 -d\ )"
 	if [ "$ISIZE" -lt "$OSIZE" ]; then
 		echo "Input smaller than output, doing straight copy" >&2
 		cp "$1" "$2"
