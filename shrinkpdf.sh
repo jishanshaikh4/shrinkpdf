@@ -36,7 +36,7 @@ shrink() {
   gs \
     -q -dNOPAUSE -dBATCH -dSAFER \
     -sDEVICE=pdfwrite \
-    -dCompatibilityLevel=1.3 \
+    -dCompatibilityLevel="$4" \
     -dPDFSETTINGS=/screen \
     -dEmbedAllFonts=true \
     -dSubsetFonts=true \
@@ -51,14 +51,33 @@ shrink() {
     "$1"
 }
 
+get_pdf_version() {
+  # $1 is the input file. The PDF version is contained in the
+  # first 1024 bytes and will be extracted from the PDF file.
+  version=$(head -c 1024 "$1" | grep -Eoa "%PDF-[0-9]\.[0-9]")
+
+  # If the pdf version could not be extracted, do not change it
+  if [ -z "$version" ]; then
+    return
+  fi
+
+  # If the version has an unexpected length, do not change it
+  if [ "${#version}" != "8" ]; then
+    return
+  fi
+
+  # Extract only the version and omit "%PDF-"
+  PDF_VERSION="${version:5}"
+}
+
 check_smaller() {
   # If $1 and $2 are regular files, we can compare file sizes to
   # see if we succeeded in shrinking. If not, we copy $1 over $2:
   if [ ! -f "$1" ] || [ ! -f "$2" ]; then
     return 0
   fi
-  ISIZE="$(echo "$(wc -c "$1")" | cut -f1 -d\ )"
-  OSIZE="$(echo "$(wc -c "$2")" | cut -f1 -d\ )"
+  ISIZE="$(wc -c "$1" | cut -f1 -d\ )"
+  OSIZE="$(wc -c "$2" | cut -f1 -d\ )"
   if [ "$ISIZE" -lt "$OSIZE" ]; then
     echo "Input smaller than output, doing straight copy" >&2
     cp "$1" "$2"
@@ -93,6 +112,9 @@ else
   res="90"
 fi
 
-shrink "$IFILE" "$OFILE" "$res" || exit $?
+PDF_VERSION="1.3"
+get_pdf_version "$IFILE"
+
+shrink "$IFILE" "$OFILE" "$res" "$PDF_VERSION" || exit $?
 
 check_smaller "$IFILE" "$OFILE"
